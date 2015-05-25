@@ -1,0 +1,7 @@
+<html>
+<body>
+<h2> {{text}}</h2>
+    <h3>正在跳转...</h3>
+    <a href="{{url}}">没跳转，请点这里。</a>
+</body>
+</html>
