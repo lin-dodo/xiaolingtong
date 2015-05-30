@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en-gb" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title></title>
+        <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
+        <link rel="apple-touch-icon-precomposed" href="images/apple-touch-icon.png">
+        <link rel="stylesheet" href="/static/css/uikit.gradient.css" />
+        <script src="/static/js/jquery.js"></script>
+        <script src="/static/js/uikit.js"></script>
+    </head>
+    <body>
+    
+<div class="uk-container uk-container-center uk-margin-top uk-margin-large-bottom">
+
+            <nav class="uk-navbar uk-margin-large-bottom">
+                <a class="uk-navbar-brand uk-hidden-small" href="/">小灵通</a>
+                <ul class="uk-navbar-nav uk-hidden-small">
+                    <li>
+                        <a href="/">任务</a>
+                    </li>
+                    <li>
+                        <a href="/contacts">联系人</a>
+                    </li>
+                    <li>
+                        <a href="/user">个人资料</a>
+                    </li>
+                    <li>
+                        <a href="/document">文档</a>
+                    </li>
+                    <li class="uk-active">
+                        <a href="/about">关于</a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" onclick="clearCookie()">登出</a>
+                    </li>
+                </ul>
+                <a href="#offcanvas" class="uk-navbar-toggle uk-visible-small" data-uk-offcanvas></a>
+                <div class="uk-navbar-brand uk-navbar-center uk-visible-small">小灵通</div>
+            </nav>
+              <div id="offcanvas" class="uk-offcanvas">
+            <div class="uk-offcanvas-bar">
+                <ul class="uk-nav uk-nav-offcanvas">
+                    <li>
+                        <a href="/">任务</a>
+                    </li>
+                    <li>
+                        <a href="/contacts">联系人</a>
+                    </li>
+                    <li>
+                        <a href="/user">个人资料</a>
+                    </li>
+                    <li>
+                        <a href="/document">文档</a>
+                    </li>
+                    <li class="uk-active">
+                        <a href="/about">关于</a>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)" onclick="clearCookie()">登出</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </body>
+    <script>
+    function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + "; " + expires;
+    }
+    function clearCookie() {  
+        setCookie("username", "", -1); 
+        setCookie("token","",-1) ;
+        window.location.href ="./login/";
+    }
+    </script>
+</html>
