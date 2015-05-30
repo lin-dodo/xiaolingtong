@@ -19,7 +19,7 @@
 <br>
 <br>
 <div class="uk-text-center">
-	<form class="uk-form">
+	<div class="uk-form">
 	<fieldset data-uk-margin>
 		<input type="text" placeholder="邮箱" id="username">
 		<br>
@@ -27,12 +27,11 @@
 		<br>
 		<button class="uk-button" onclick="login()">登录</button>
 	</fieldset>
-	</form>
+	</div>
 </div>
 </body>
 <script>
-	function login()
-	{
+	function login(){
 
 	            username = $("#username").val();
 	            pwd = $("#pwd").val();
@@ -40,16 +39,15 @@
 	                alert("请输入用户名或密码。");
 	                return;
 	            }
-	             else{
+                	else{
+
 	             $.post("/login/",
 	             	{
 	             		username:username,
 	             		pwd:hex_md5(pwd)
 	             	},
 	             	function(data,status){
-	             		alert(data);
 	             		if(status=='success'){
-	             			alert(data);
 	             			errcode=JSON.parse(data);
 	             			if(errcode.errCode==0){
 	             				alert("无此用户");
@@ -57,13 +55,11 @@
 	             			}
 
 	             			if (errcode.errCode==1){
-	             				alert("密码错误！");
+	             				alert("密码错误!");
 	             				return;
 	             			}
 	             			else{
-	             				alert("heheh");
-	             				
-	             				return;
+	             				window.location.href ="/";
 	             			}
 	             		}
 	             		else{
@@ -73,6 +69,6 @@
 	             	}
 		
             }
-	
+
 </script>
 </html>

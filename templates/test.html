@@ -9,4 +9,11 @@
     <h3>正在跳转...</h3>
     <a href="{{url}}">没跳转，请点这里。</a>
 </body>
+<script>
+    function redirect(){
+        window.location.href = "/login/"
+    }
+
+    setTimeout(redirect, 1000);//延时1秒
+</script>
 </html>

@@ -5,10 +5,11 @@ from flask import g
 import json
 import copy,sys
 import random,dbtool
+cookies_remain_time=24*60*60
 def strrandom(len):
     ret=''
     while len:
-        ret += random.choice('zyxwvutsrqponmlkjihgfedcba_$#@~ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+        ret += random.choice('zyxwvutsrqponmlkjihgfedcbaABCDEFGHIJKLMNOPQRSTUVWXYZ')
         len -= 1
     return ret
 
@@ -64,38 +65,48 @@ def login():
         user=request.form.get('username','')
         pwd=request.form.get('pwd','')
         retData={}
-        print pwd
-        #pass_real=g.dH.get_pwd(user)
-        #token=''
-        # if pass_real==0:
-        #     retData['errCode']=0
-        # else:
-        #     #print pwd,pass_real
-        #     if pwd==pass_real:
-        #         retData['errCode']=-1
-        #         token=strrandom(32)
-        #         retData['token']=token
-        #     else:
-        #         retData['errCode']=1
-        # g.dH.set_token(user,token)
-        # e=make_response( json.dumps(retData))
-        # re.set_cookie('username',user)
-        # re.set_cookie('token',token)
-        return "8888"
+        #print pwd
+        pass_real=g.dH.get_pwd(user)
+        token=''
+        if pass_real==0:
+            retData['errCode']=0
+        else:
+            #print pwd,pass_real
+            if pwd==pass_real:
+                retData['errCode']=-1
+                token=strrandom(32)
+                retData['token']=token
+            else:
+                retData['errCode']=1
+        g.dH.set_token(user,token)
+        re=make_response( json.dumps(retData))
+        re.set_cookie('username',user,cookies_remain_time)
+        re.set_cookie('token',token,cookies_remain_time)
+        return re
     else:
+        token = request.cookies.get('token', '')
+        if token !='':
+            if g.dH.check_token(token):
+                return render_template("index.html")
         return render_template('login.html')
 
 
-@app.route('/see/')
-def see():
-    session['see']="hh"
-    return "ll"
-@app.route('/at/')
-def f():
-    return session['see']
-@app.route('/out/')
-def out():
-    session.pop('see',None)
-    return "ok"
+@app.route('/contacts/')
+@login_require(2)
+def contacts():
+    return render_template('contacts.html')
+@app.route('/document/')
+@login_require(2)
+def document():
+    return render_template('document.html')
+@app.route('/user/')
+@login_require(2)
+def user():
+    return render_template('user.html')
+@app.route('/about/')
+@login_require(2)
+def about():
+    return render_template('about.html')
+
 if __name__ == '__main__':
     app.run("0.0.0.0",debug=True)
