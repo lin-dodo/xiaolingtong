@@ -29,12 +29,12 @@ def login_require(permit = 2):
     def _checkLogin(func):
         def checkLogin(*args, **kwds):
             token = request.cookies.get('token', '')
-            #name =request.cookies.get('name','')
+            username =request.cookies.get('username','')
             if token == '':
                 token = request.form.get('token', '')
-            if token == '':
+            if token == '' or username=='':
                 return render_template("test.html", text="sorry, please login first.", url=url_for('login', url=request.url) )
-            elif not g.dH.check_token(token):
+            elif not g.dH.check_token(username,token):
                 #print url_for('see', url=request.url)
                 return render_template("test.html", text="sorry, the user has logout or login in other place.", url=url_for('login', url=request.url) )
             return func(*args, **kwds)
@@ -85,12 +85,24 @@ def login():
         return re
     else:
         token = request.cookies.get('token', '')
+        username= request.cookies.get('username','')
         if token !='':
-            if g.dH.check_token(token):
+            if g.dH.check_token(username,token):
                 return render_template("index.html")
         return render_template('login.html')
 
-
+@app.route('/list/')
+@login_require()
+def search():
+    Data={}
+    type=request.args.get('type','')
+    username=request.cookies.get('username','')
+    if type=='' and username =='':
+        Data['errCode']=-1
+    else:
+        if type=='task':
+            Data=g.dH.list_task(username)
+    return json.dumps(Data)
 @app.route('/contacts/')
 @login_require(2)
 def contacts():

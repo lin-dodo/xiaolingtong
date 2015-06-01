@@ -1,4 +1,4 @@
-import sqlite3
+import sqlite3,json
 class data_handle:
     def __init__(self):
         self.conn=sqlite3.connect('temp.db')
@@ -15,9 +15,9 @@ class data_handle:
             return 0
         except Exception,e:
             return 0
-    def check_token(self,token):
+    def check_token(self,username,token):
         try:
-            self.cursor.execute("select token from token where token = '%s'"%token)
+            self.cursor.execute("select token from token where token = '%s' and username = '%s'"%(token,username))
             m=self.cursor.fetchone()
             if m!=None:
                 return True
@@ -54,6 +54,26 @@ class data_handle:
             return True
         except Exception,e:
             return False
+    def list_task(self,username):
+        self.cursor.execute("select * from task where username = '%s'"%username)
+        result=self.cursor.fetchall()
+        d=[]
+        for i in xrange(len(result)):
+            per_data={}
+            per_data['no']=i+1
+            per_data['id']=result[i][0]
+            per_data['task']=result[i][2]
+            per_data['send_list']=result[i][3]
+            per_data['date']=result[i][4]
+            per_data['status']=result[i][-1]
+            d.append(per_data)
+        data={}
+        data['data']=d
+        if len(result)==0:
+            data['errCode']=0
+        else:
+            data['errCode']=1
+        return data
 if __name__=='__main__':
     d=data_handle()
-    d.get_pwd("8674925@163.com")
+    print d.list_task("8674925@163.com")

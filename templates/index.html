@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="/static/css/uikit.gradient.css" />
         <script src="/static/js/jquery.js"></script>
         <script src="/static/js/uikit.js"></script>
+        <script src="/static/cookie.js"></script>
     </head>
     <body>
     
@@ -63,18 +64,95 @@
                 </ul>
             </div>
         </div>
+        <div>
+            <table class="uk-table uk-table-striped">
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>通知文字</th>
+                        <th>发送列表</th>
+                        <th>发送时间</th>
+                        <th>发送状态</th>
+                        <th> </th>
+                    </tr>
+                </thead>
+                <tbody id="list_task">
+                    <!--<tr>
+                        <td>1</td>
+                        <td>交作业啦</td>
+                        <td>
+                        <a href="#my_id" data-uk-offcanvas>
+                        查看
+                        </a>
+                        <div id="my_id" class="uk-offcanvas">
+                            <div class="uk-offcanvas-bar">
+                                <div class="uk-panel uk-text-break">18814122757,18814122752,18814122757,13434970345</div>
+                            </div>
+                        </div>
+                        </td>
+                        <td>2015-5-31 22:00</td>
+                        <td>未发送</td>
+                        <td><a href="#">删除</a></td>
+                    </tr>-->
+                </tbody>
+            </table>
+        </div>
     </body>
     <script>
-    function setCookie(cname, cvalue, exdays) {
-    var d = new Date();
-    d.setTime(d.getTime() + (exdays*24*60*60*1000));
-    var expires = "expires="+d.toUTCString();
-    document.cookie = cname + "=" + cvalue + "; " + expires;
+    function list_task(){
+        $.get("/list/?type=task",
+            function(data,status){
+                if(status=="success"){
+                    var tbody=$("#list_task");
+                    list_data=JSON.parse(data);
+                    if(list_data.errCode==1){
+                        for(i in list_data.data){
+                            per_data=list_data.data[i];
+                            newTR=$("<tr></tr>").attr("id","tr_"+per_data.id);
+                            newTR.append($("<td></td>").text(per_data.no));
+                            newTR.append($("<td></td>").text(per_data.task));
+                            newtd=$("<td ></td>");
+                            newtd.append($('<a data-uk-offcanvas>查看</a>').attr("href","#my_id_"+per_data.id));
+                            newdiv=$('<div></div>').attr("id","my_id_"+per_data.id);
+                            newdiv.attr("class","uk-offcanvas");
+                            newdiv.append($('<div class="uk-offcanvas-bar"></div>').append($('<div class="uk-panel uk-text-break"></div>').text(per_data.send_list)));
+                            newtd.append(newdiv);
+                            newTR.append(newtd);
+                            newTR.append($("<td></td>").text(per_data.date));
+                            newTR.append($("<td></td>").text(per_data.status));
+                            newTR.append($("<td></td>").append($('<a href="javascript:void(0)">删除</a>').attr("onclick","del("+per_data.id+")")));
+                            tbody.append(newTR);
+                        }
+                    }
+                    if(list_data.errCode==0){
+                        newTR=$("<tr></tr>");
+                        newTR.append($("<td></td>").text("无"));
+                        newTR.append($("<td></td>").text("无"));
+                        newTR.append($("<td></td>").text("无"));
+                        newTR.append($("<td></td>").text("无"));
+                        newTR.append($("<td></td>").text("无"));
+                        newTR.append($("<td></td>").text("无"));
+                        tbody.append(newTR);
+
+                    }
+                }
+            });
     }
-    function clearCookie() {  
-        setCookie("username", "", -1); 
-        setCookie("token","",-1) ;
-        window.location.href ="./login/";
+    function initData(){
+            
+            //$("#search_poster").click(search_poster);
+            //$("#search_receiver").click(search_receiver);
+            list_task();
+            //var name=getCookie("username");
+            //name=unescape(name.substring(1,name.length-1));
+        }
+    function del(id){
+        var close =confirm("确定删除？");
+        if(close){
+            $("#tr_"+id).remove();
+        }
+        
     }
+    $(document).ready(initData);
     </script>
 </html>
