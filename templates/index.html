@@ -97,6 +97,40 @@
                 </tbody>
             </table>
         </div>
+        <a href="#my" data-uk-modal>添加新任务</a>
+        <div id="my" class="uk-modal">
+        <div class="uk-modal-dialog">
+            <a class="uk-modal-close uk-close"></a>
+            <div class="uk-modal-header">添加新任务</div>
+                <div class="uk-form-row">
+                <input type="text" placeholder="通知内容：（不超过30字）" id="task" class="uk-width-1-1">
+                </div>
+                <br>
+                <div class="uk-form-select uk-form-row" data-uk-form-select>
+                    <span>选择联系人分组：</span>
+                    <select id="mySelect">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                    </select>
+                
+                    <span>选择通知方式：</span>
+                    <select>
+                        <option value="phone">phone</option>
+                        <option value="e-mail">E-mail</option>
+                    </select>
+                </div>
+                <div class="uk-form-row">
+                <input type="text" placeholder="发送时间：（格式：2015-5-1 22:00）" class="uk-width-1-1">
+                </div>
+                <br>
+            <div class="uk-modal-footer">
+                <div class="uk-pagination-right">
+                <button class="uk-button uk-modal-close">取消</button>
+                <button class="uk-button uk-modal-close">确定</button>
+            </div>
+            </div>
+                </div>
+            </div>
     </body>
     <script>
     function list_task(){
@@ -143,6 +177,9 @@
             //$("#search_poster").click(search_poster);
             //$("#search_receiver").click(search_receiver);
             list_task();
+            $("#mySelect").change(function(){  
+            alert($("#mySelect").val());
+            }) 
             //var name=getCookie("username");
             //name=unescape(name.substring(1,name.length-1));
         }
