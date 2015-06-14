@@ -48,6 +48,7 @@ def login_require(permit = 2):
         return checkLogin
 
     return _checkLogin
+
 @app.before_request
 def before_request():
     g.dH = dbtool.data_handle()
@@ -102,11 +103,26 @@ def search():
     else:
         if type=='task':
             Data=g.dH.list_task(username)
+        if type=='contasts':
+            contact_type=request.args.get('contast_type','')
+            group_name=request.args.get('group_name','')
+            Data=g.dH.list_contacts(username,contact_type,group_name)
+
     return json.dumps(Data)
 @app.route('/contacts/')
 @login_require(2)
 def contacts():
     return render_template('contacts.html')
+@app.route('/searchcontacts/')
+@login_require(2)
+def searchcontacts():
+    username=request.cookies.get('username','')
+    group_name=request.args.get('group_name','')
+    type=request.args.get('type','')
+    print type,group_name
+    Data=g.dH.list_contacts(username,type,group_name)
+    return json.dumps(Data)
+
 @app.route('/document/')
 @login_require(2)
 def document():
@@ -119,6 +135,13 @@ def user():
 @login_require(2)
 def about():
     return render_template('about.html')
+@app.route('/searchtask/')
+def searchtask():
+    type=request.args.get('type','')
+    if type=='phone':
+        Data=g.dH.searchtask_api('2015-6-12',type)
+        return json.dumps(Data)
+
 
 
 if __name__ == '__main__':

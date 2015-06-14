@@ -4,12 +4,14 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title></title>
-        <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
-        <link rel="apple-touch-icon-precomposed" href="images/apple-touch-icon.png">
-        <link rel="stylesheet" href="/static/css/uikit.gradient.css" />
+        <link rel="stylesheet" href="/static/css/uikit.gradient.css">
         <script src="/static/js/jquery.js"></script>
         <script src="/static/js/uikit.js"></script>
         <script src="/static/cookie.js"></script>
+        <link id="data-uikit-theme" rel="stylesheet" href="/static/css/uikit.docs.min.css">
+        <script src="http://www.getuikit.net/src/js/components/datepicker.js"></script>
+        <script src="http://www.getuikit.net/src/js/components/autocomplete.js"></script>
+        <script src="http://www.getuikit.net/src/js/components/timepicker.js"></script>
     </head>
     <body>
     
@@ -77,23 +79,7 @@
                     </tr>
                 </thead>
                 <tbody id="list_task">
-                    <!--<tr>
-                        <td>1</td>
-                        <td>交作业啦</td>
-                        <td>
-                        <a href="#my_id" data-uk-offcanvas>
-                        查看
-                        </a>
-                        <div id="my_id" class="uk-offcanvas">
-                            <div class="uk-offcanvas-bar">
-                                <div class="uk-panel uk-text-break">18814122757,18814122752,18814122757,13434970345</div>
-                            </div>
-                        </div>
-                        </td>
-                        <td>2015-5-31 22:00</td>
-                        <td>未发送</td>
-                        <td><a href="#">删除</a></td>
-                    </tr>-->
+                    
                 </tbody>
             </table>
         </div>
@@ -102,25 +88,29 @@
         <div class="uk-modal-dialog">
             <a class="uk-modal-close uk-close"></a>
             <div class="uk-modal-header">添加新任务</div>
-                <div class="uk-form-row">
+                <div class="uk-form-row uk-margin-remove uk-display-inline-block uk-width-1-1">
                 <input type="text" placeholder="通知内容：（不超过30字）" id="task" class="uk-width-1-1">
                 </div>
-                <br>
-                <div class="uk-form-select uk-form-row" data-uk-form-select>
+                <div class="uk-panel uk-panel-box" id="send_list">
+                    <h5>发送列表：18814122757,18821233567</h5>
+                    <input type="text" placeholder="在这里手动添加,以','分隔开" id="addcontact">
+                </div>
+                <div class="uk-form-row" data-uk-form-select>
                     <span>选择联系人分组：</span>
-                    <select id="mySelect">
+                    <select id="groupId">
                         <option value="1">1</option>
                         <option value="2">2</option>
                     </select>
                 
                     <span>选择通知方式：</span>
-                    <select>
+                    <select  id="type">
                         <option value="phone">phone</option>
                         <option value="e-mail">E-mail</option>
                     </select>
                 </div>
                 <div class="uk-form-row">
-                <input type="text" placeholder="发送时间：（格式：2015-5-1 22:00）" class="uk-width-1-1">
+                    <input type="" data-uk-datepicker="{format:'YYYY-MM-DD'}"></input>
+                    <input type="text" data-uk-timepicker="">
                 </div>
                 <br>
             <div class="uk-modal-footer">
@@ -177,8 +167,8 @@
             //$("#search_poster").click(search_poster);
             //$("#search_receiver").click(search_receiver);
             list_task();
-            $("#mySelect").change(function(){  
-            alert($("#mySelect").val());
+            $("#groupId").change(function(){  
+            alert($("#groupId").val());
             }) 
             //var name=getCookie("username");
             //name=unescape(name.substring(1,name.length-1));
