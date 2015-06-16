@@ -7,4 +7,9 @@ CREATE TABLE `task` (
 	`send_way`	char(4),
 	`status`	char(10) DEFAULT '('未发送')'
 );
+create table `contacts_group`(
+	`id` integer primary key autoincrement,
+	`group_name` char(30) primary key,
+	`username` char(30)
+)
 

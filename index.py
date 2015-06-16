@@ -3,7 +3,7 @@ from flask import request
 from flask import render_template, redirect, url_for, make_response, flash, abort,session
 from flask import g
 import json
-import copy,sys
+import copy,sys,urllib,datetime
 import random,dbtool
 cookies_remain_time=24*60*60
 def strrandom(len):
@@ -60,6 +60,26 @@ def index():
 
     #return 'Hello World!'
 
+@app.route("/register/",methods=['GET', 'POST'])
+def register():
+    if request.method=='GET':
+        username=request.args.get('username','')
+        if username=='':
+            return render_template("register.html")
+        else:
+            return str(g.dH.get_pwd(username))
+    else:
+        user=request.form.get('name','')
+        pwd=request.form.get('pwd','')
+        token=strrandom(32)
+        if g.dH.new_user(user,pwd) and g.dH.new_token(user,token):
+            #return "0"
+            re=make_response("0")
+            re.set_cookie('username',user,cookies_remain_time)
+            re.set_cookie('token',token,cookies_remain_time)
+            return re
+        else:
+            return "-1"
 @app.route("/login/", methods=['GET', 'POST'])
 def login():
     if request.method =='POST':
@@ -107,6 +127,8 @@ def search():
             contact_type=request.args.get('contast_type','')
             group_name=request.args.get('group_name','')
             Data=g.dH.list_contacts(username,contact_type,group_name)
+        if type=='group':
+            Data=g.dH.getContact_group(username)
 
     return json.dumps(Data)
 @app.route('/contacts/')
@@ -117,10 +139,9 @@ def contacts():
 @login_require(2)
 def searchcontacts():
     username=request.cookies.get('username','')
-    group_name=request.args.get('group_name','')
-    type=request.args.get('type','')
-    print type,group_name
-    Data=g.dH.list_contacts(username,type,group_name)
+    group_name=urllib.unquote(request.args.get('group_name',''))
+    print group_name
+    Data=g.dH.list_contacts(username,group_name)
     return json.dumps(Data)
 
 @app.route('/document/')
@@ -139,9 +160,66 @@ def about():
 def searchtask():
     type=request.args.get('type','')
     if type=='phone':
-        Data=g.dH.searchtask_api('2015-6-12',type)
+        now=datetime.datetime.now()
+        t=now.strftime("%Y-%m-%d %H:%M:%S")
+        Data=g.dH.searchtask_api(t,type)
         return json.dumps(Data)
-
+@app.route("/new/",methods=['GET', 'POST'])
+@login_require(2)
+def newItem():
+    if request.method =='GET':
+        username=request.cookies.get('username','')
+        type=request.args.get('type','')
+        if type=='group':
+            g_name=request.args.get('g_name','')
+            if type=='':
+                return "-1"
+            else:
+                if g.dH.new_group(username,urllib.unquote(g_name)):
+                    return "0"
+                else:
+                    return "-1"
+        if type=='contact':
+            g_name=urllib.unquote(request.args.get('g_name',''))
+            c_name=urllib.unquote(request.args.get('c_name',''))
+            c_no=request.args.get('c_no','')
+            c_type=request.args.get('c_type','')
+            if g_name=='' or c_name=='' or c_no=='':
+                return "-1"
+            else:
+                if g.dH.new_contact(username,g_name,c_name,c_no,c_type):
+                    return "0"
+                else:
+                    return "-1"
+    else:
+        username=request.cookies.get('username','')
+        task=request.form.get('task','')
+        send_list=request.form.get('send_list','')
+        set_date=request.form.get('date','')
+        set_way=request.form.get('type','')
+        if task!='' or send_list!='' or set_date!='' or set_way!='':
+            if g.dH.new_task(username,task,send_list,set_date,set_way):
+                return "0"
+            else:
+                return "-1"
+        else:
+            return "-1"
+@app.route("/delete/")
+@login_require(2)
+def delete():
+    username=request.cookies.get('username','')
+    type=request.args.get('type','')
+    if type=='task':
+        id=request.args.get('id','')
+        if id!='':
+            if g.dH.del_task(username,id):
+                print "del"
+                return "0"
+            else:
+                print "failed"
+                return "-1"
+        else:
+            return "-1"
 
 
 if __name__ == '__main__':

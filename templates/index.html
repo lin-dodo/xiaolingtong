@@ -12,6 +12,7 @@
         <script src="http://www.getuikit.net/src/js/components/datepicker.js"></script>
         <script src="http://www.getuikit.net/src/js/components/autocomplete.js"></script>
         <script src="http://www.getuikit.net/src/js/components/timepicker.js"></script>
+        <script src="http://www.getuikit.net/src/js/components/notify.js"></script>
     </head>
     <body>
     
@@ -92,37 +93,62 @@
                 <input type="text" placeholder="通知内容：（不超过30字）" id="task" class="uk-width-1-1">
                 </div>
                 <div class="uk-panel uk-panel-box" id="send_list">
-                    <h5>发送列表：18814122757,18821233567</h5>
-                    <input type="text" placeholder="在这里手动添加,以','分隔开" id="addcontact">
+                    <!--<h5>发送列表：18814122757,18821233567</h5>
+                    <input type="text" placeholder="在这里手动添加,以','分隔开" id="addcontact">-->
                 </div>
                 <div class="uk-form-row" data-uk-form-select>
                     <span>选择联系人分组：</span>
                     <select id="groupId">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
                     </select>
                 
                     <span>选择通知方式：</span>
                     <select  id="type">
                         <option value="phone">phone</option>
-                        <option value="e-mail">E-mail</option>
+                        <option value="email">E-mail</option>
                     </select>
                 </div>
                 <div class="uk-form-row">
-                    <input type="" data-uk-datepicker="{format:'YYYY-MM-DD'}"></input>
-                    <input type="text" data-uk-timepicker="">
+                    <input type="" placeholder="日期" data-uk-datepicker="{format:'YYYY-MM-DD'}" id="s_date"></input>
+                    <input type="text" placeholder="时间" data-uk-timepicker="" id="s_time">
                 </div>
                 <br>
             <div class="uk-modal-footer">
                 <div class="uk-pagination-right">
                 <button class="uk-button uk-modal-close">取消</button>
-                <button class="uk-button uk-modal-close">确定</button>
+                <button class="uk-button uk-modal-close" onclick="newtask()">确定</button>
             </div>
             </div>
                 </div>
             </div>
     </body>
     <script>
+    function newtask(){
+        var t=$("#task").val();
+        var type=$("#type").val();
+        var s=$("#addcontact").val();
+        if(s.length>0){
+            var send_list=s_list+","+s;
+        }
+        else{
+            var send_list=s_list;
+        }
+        var set_date=$("#s_date").val()+" "+$("#s_time").val();
+        var type=$("#type").val();
+        $.post("/new/",
+        {
+            task:t,
+            send_list:send_list,
+            date:set_date,
+            type:type
+        },
+        function(data,status){
+                if(status=='success'){
+                    if(data=='0'){
+                        alert("添加成功");
+                    }
+                }
+        });
+    }
     function list_task(){
         $.get("/list/?type=task",
             function(data,status){
@@ -162,13 +188,71 @@
                 }
             });
     }
+    function list_group(){
+        $.get("/list/?type=group",
+            function(data,status){
+                if(status=="success"){
+                    var select=$("#groupId");
+                    select.empty();
+                    list_data=JSON.parse(data);
+                    if(list_data.errCode==1){
+                        for(i in list_data.data){
+                            per_data=list_data.data[i];
+                            select.append('<option value="'+per_data.group_name+'">'+per_data.group_name+'</option>');
+                        }
+                        initSendlist();
+                    }
+                    if(list_data.errCode==0){
+                        select.append('<option value="-1">请先添加联系人分组</option>')
+
+                    }
+                }
+            });
+    }
+    function initSendlist(){
+                var g_name=$("#groupId").val();
+                var send=$("#send_list");
+                var type=$("#type").val();
+                send.empty();
+                $.get("/searchcontacts/?group_name="+encodeURIComponent(g_name),
+                function(data,status){
+                    if(status=='success'){
+                            var box=$("#send_list");
+                            list_data=JSON.parse(data);
+                            if(list_data.errCode==1){
+                                s_list="";
+                                for(i in list_data.data){
+                                    per_data=list_data.data[i];
+                                    if(type!=per_data.type){
+                                        continue;
+                                    }
+                                    if(i==0){
+                                    s_list=per_data.contact;
+                                }
+                                else{
+                                    s_list=per_data.contact+","+s_list;
+                                }
+                            }
+                            box.append($("<h5>发送列表："+s_list+"</h5>"));
+                            box.append($('<input type="text" placeholder="在这里手动添加,以,分隔开" id="addcontact">'));
+                        }
+                            if(list_data.errCode==0){
+                                    box.append($("<h5>分组里面无联系人：</h5>"));
+                                    box.append($('<input type="text" placeholder="在这里手动添加,以,分隔开" id="addcontact">'));
+                            }
+                        }
+                    }
+                );
+    }
     function initData(){
             
             //$("#search_poster").click(search_poster);
             //$("#search_receiver").click(search_receiver);
+            s_list='';
             list_task();
+            list_group();
             $("#groupId").change(function(){  
-            alert($("#groupId").val());
+                initSendlist();
             }) 
             //var name=getCookie("username");
             //name=unescape(name.substring(1,name.length-1));
@@ -177,6 +261,14 @@
         var close =confirm("确定删除？");
         if(close){
             $("#tr_"+id).remove();
+            $.get("/delete/?type=task&id="+id,
+                function(data,status){
+                    if(status=='success'){
+                        if(data=='0'){
+                            alert("删除成功");
+                        }
+                    }
+                });
         }
         
     }
